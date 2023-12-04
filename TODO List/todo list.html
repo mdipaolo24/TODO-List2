@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1 id="title">To-Do List</h1>
+<hr>
+<br>
+<div class="container">
+    <input type="text" id="new-task" placeholder="Add a new task">
+    <button onclick="addTask()">Add Task</button>
+</div>
+
+<div class="container">
+    <h3>Tasks</h3>
+    <hr>
+    <ul id="incomplete-tasks"></ul>
+</div>
+
+<div class="container" id="completed-tasks">
+    <h3>Completed Tasks</h3>
+    <ul id="completed-list"></ul>
+</div>
+
+<button class="dark-mode-btn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+<button class="clear-all-btn" onclick="clearAllTasks()">Clear All</button>
+
+<script>
+    function addTask() {
+        var taskInput = document.getElementById("new-task");
+        var incompleteTasksHolder = document.getElementById("incomplete-tasks");
+
+        if (taskInput.value.trim() !== "") {
+            var listItem = createNewTaskElement(taskInput.value);
+            incompleteTasksHolder.appendChild(listItem);
+            bindTaskEvents(listItem, taskCompleted);
+
+            taskInput.value = "";
+        }
+    }
+
+    function createNewTaskElement(taskString) {
+        var listItem = document.createElement("li");
+        var checkBox = document.createElement("input");
+        var label = document.createElement("label");
+        var editInput = document.createElement("input");
+        var editButton = document.createElement("button");
+        var deleteButton = document.createElement("button");
+
+        checkBox.type = "checkbox";
+        label.innerText = taskString;
+        editInput.type = "text";
+        editButton.innerText = "Edit";
+        editButton.className = "edit";
+        deleteButton.innerText = "Delete";
+        deleteButton.className = "delete";
+
+        listItem.appendChild(checkBox);
+        listItem.appendChild(label);
+        listItem.appendChild(editInput);
+        listItem.appendChild(editButton);
+        listItem.appendChild(deleteButton);
+
+        return listItem;
+    }
+
+    function bindTaskEvents(taskListItem, checkBoxEventHandler) {
+        var checkBox = taskListItem.querySelector("input[type=checkbox]");
+        var editButton = taskListItem.querySelector("button.edit");
+        var deleteButton = taskListItem.querySelector("button.delete");
+
+        editButton.onclick = editTask;
+        deleteButton.onclick = deleteTask;
+        checkBox.onchange = checkBoxEventHandler;
+    }
+
+    function editTask() {
+        var listItem = this.parentNode;
+        var editInput = listItem.querySelector("input[type=text]");
+        var label = listItem.querySelector("label");
+        var containsClass = listItem.classList.contains("editMode");
+
+        // If the class of the parent is .editMode
+        if (containsClass) {
+            // Switch back from .editMode
+            label.innerText = editInput.value;
+        } else {
+            // Switch to .editMode
+            editInput.value = label.innerText;
+        }
+
+        // Toggle .editMode on the list item
+        listItem.classList.toggle("editMode");
+    }
+
+    function deleteTask() {
+        var listItem = this.parentNode;
+        var ul = listItem.parentNode;
+
+        ul.removeChild(listItem);
+    }
+
+    function taskCompleted() {
+        var listItem = this.parentNode;
+        var completedTasksHolder = document.getElementById("completed-list");
+        completedTasksHolder.appendChild(listItem);
+        bindTaskEvents(listItem, taskIncomplete);
+    }
+
+    function taskIncomplete() {
+        var listItem = this.parentNode;
+        var incompleteTasksHolder = document.getElementById("incomplete-tasks");
+        incompleteTasksHolder.appendChild(listItem);
+        bindTaskEvents(listItem, taskCompleted);
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+    function clearAllTasks() {
+        var incompleteTasksHolder = document.getElementById("incomplete-tasks");
+        var completedTasksHolder = document.getElementById("completed-list");
+
+        // Remove all tasks from the incomplete tasks list
+        while (incompleteTasksHolder.firstChild) {
+            incompleteTasksHolder.removeChild(incompleteTasksHolder.firstChild);
+        }
+
+        // Remove all tasks from the completed tasks list
+        while (completedTasksHolder.firstChild) {
+            completedTasksHolder.removeChild(completedTasksHolder.firstChild);
+        }
+    }
+</script>
+
+</body>
+</html>
